@@ -1,4 +1,4 @@
-name: F5XC AWS Virtual Kubernetes module
+name: F5XC Virtual Kubernetes module
 on: push
 jobs:
   f5-xc-vk8s-module-validate:
