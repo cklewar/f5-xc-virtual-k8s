@@ -160,7 +160,7 @@ module "vk8s_wait_for_online" {
   f5xc_vk8s_name = format("%s-vk8s-%s", var.project_prefix, var.project_suffix)
 }
 
-resource "null_resource" "apply_credentials" {
+/*resource "null_resource" "apply_credentials" {
   depends_on = [module.vk8s_wait_for_online, local_file.kubeconfig]
   triggers   = {
     kubectl_secret_registry_type          = var.kubectl_secret_registry_type
@@ -180,14 +180,14 @@ resource "null_resource" "apply_credentials" {
       KUBECONFIG = format("%s/%s", local.f5xc_vk8s_kubeconfig_file_path, var.f5xc_vk8s_kubeconfig_filename)
     }
   }
-}
+}*/
 
-output "kube_config" {
+/*output "kube_config" {
   value     = base64decode(module.credential.api_credential["data"])
   sensitive = true
 }
 
 output "workload_config" {
   value = local.workload_content
-}
+}*/
 
