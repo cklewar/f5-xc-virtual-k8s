@@ -95,8 +95,9 @@ jobs:
           TF_VAR_f5xc_api_url: ${{ secrets.f5xc_api_url }}
           TF_VAR_f5xc_api_p12_file: ${{ secrets.f5xc_api_p12_file }}
           TF_VAR_f5xc_api_token: ${{ secrets.f5xc_api_token }}
-          TF_TOKEN_app_terraform_io: ${{ secrets.TF_TOKEN_APP_TERRAFORM_IO }}
           TF_VAR_f5xc_tenant: ${{ secrets.F5XC_TENANT }}
+          TF_VAR_f5xc_api_credential_password: ${{ secrets.F5XC_API_CREDENTIAL_PASSWORD }}
+          TF_TOKEN_app_terraform_io: ${{ secrets.TF_TOKEN_APP_TERRAFORM_IO }}
           TF_VAR_kubectl_secret_registry_email: ${{ secrets.KUBECTL_SECRET_REGISTRY_EMAIL }}
           TF_VAR_kubectl_secret_registry_password: ${{ secrets.KUBECTL_SECRET_REGISTRY_PASSWORD }}
           TF_VAR_kubectl_secret_registry_username: ${{ secrets.KUBECTL_SECRET_REGISTRY_USERNAME }}
@@ -156,8 +157,9 @@ jobs:
           TF_VAR_f5xc_api_url: ${{ secrets.f5xc_api_url }}
           TF_VAR_f5xc_api_p12_file: ${{ secrets.f5xc_api_p12_file }}
           TF_VAR_f5xc_api_token: ${{ secrets.f5xc_api_token }}
-          TF_TOKEN_app_terraform_io: ${{ secrets.TF_TOKEN_APP_TERRAFORM_IO }}
           TF_VAR_f5xc_tenant: ${{ secrets.F5XC_TENANT }}
+          TF_VAR_f5xc_api_credential_password: ${{ secrets.F5XC_API_CREDENTIAL_PASSWORD }}
+          TF_TOKEN_app_terraform_io: ${{ secrets.TF_TOKEN_APP_TERRAFORM_IO }}
           TF_VAR_kubectl_secret_registry_email: ${{ secrets.KUBECTL_SECRET_REGISTRY_EMAIL }}
           TF_VAR_kubectl_secret_registry_password: ${{ secrets.KUBECTL_SECRET_REGISTRY_PASSWORD }}
           TF_VAR_kubectl_secret_registry_username: ${{ secrets.KUBECTL_SECRET_REGISTRY_USERNAME }}
@@ -217,8 +219,9 @@ jobs:
           TF_VAR_f5xc_api_url: ${{ secrets.f5xc_api_url }}
           TF_VAR_f5xc_api_p12_file: ${{ secrets.f5xc_api_p12_file }}
           TF_VAR_f5xc_api_token: ${{ secrets.f5xc_api_token }}
-          TF_TOKEN_app_terraform_io: ${{ secrets.TF_TOKEN_APP_TERRAFORM_IO }}
           TF_VAR_f5xc_tenant: ${{ secrets.F5XC_TENANT }}
+          TF_VAR_f5xc_api_credential_password: ${{ secrets.F5XC_API_CREDENTIAL_PASSWORD }}
+          TF_TOKEN_app_terraform_io: ${{ secrets.TF_TOKEN_APP_TERRAFORM_IO }}
           TF_VAR_kubectl_secret_registry_email: ${{ secrets.KUBECTL_SECRET_REGISTRY_EMAIL }}
           TF_VAR_kubectl_secret_registry_password: ${{ secrets.KUBECTL_SECRET_REGISTRY_PASSWORD }}
           TF_VAR_kubectl_secret_registry_username: ${{ secrets.KUBECTL_SECRET_REGISTRY_USERNAME }}
