@@ -158,12 +158,12 @@ resource "local_file" "kubeconfig" {
 }
 
 resource "null_resource" "apply_credentials" {
-  depends_on = [module.vk8s_wait_for_online, local_file.kubeconfig]
+  depends_on = [module.vk8s, local_file.kubeconfig]
   triggers   = {
+    kubectl_secret_name                   = var.kubectl_secret_name
     kubectl_secret_registry_type          = var.kubectl_secret_registry_type
     kubectl_secret_registry_server_type   = var.kubectl_secret_registry_server_type
     kubectl_secret_registry_server_name   = var.kubectl_secret_registry_server_name
-    kubectl_secret_name                   = var.kubectl_secret_name
     kubectl_secret_registry_username      = var.kubectl_secret_registry_username
     kubectl_secret_registry_username_type = var.kubectl_secret_registry_username_type
     kubectl_secret_registry_password      = var.kubectl_secret_registry_password
