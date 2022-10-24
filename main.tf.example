@@ -113,7 +113,7 @@ locals {
   f5xc_vk8s_template_file_path   = format("%s/%s", path.module, "templates")
   f5xc_vk8s_kubeconfig_file_path = format("%s/%s", path.module, "_out")
   workload_content               = templatefile(format("%s/%s", local.f5xc_vk8s_template_file_path, var.f5xc_vk8s_template_filename), {
-    namespace = var.f5xc_virtual_k8s_namespace
+    namespace = var.f5xc_namespace
   })
 }
 
@@ -144,7 +144,6 @@ module "credential" {
   f5xc_virtual_k8s_name      = module.vk8s.vk8s["name"]
   f5xc_api_credential_type   = "KUBE_CONFIG"
   f5xc_api_credentials_name  = format("%s-vk8s-credential-%s", var.project_prefix, var.project_suffix)
-  f5xc_virtual_k8s_namespace = var.f5xc_virtual_k8s_namespace
 }
 
 resource "local_file" "workload" {
