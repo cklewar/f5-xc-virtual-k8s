@@ -163,7 +163,7 @@ jobs:
         run: terraform apply -auto-approve -no-color
         continue-on-error: false
       - name: Copy JSON state
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: json_artifact
           path: ${{ github.workspace }}/modules/f5xc/api-credential/_out/response.json
@@ -193,7 +193,7 @@ jobs:
           token: ${{ secrets.GH_PAT }}
       - run: echo "The ${{ github.repository }} repository has been cloned to the runner."
       - name: Copy JSON state
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v3
         with:
           name: json_artifact
           path: ${{ github.workspace }}/modules/f5xc/api-credential/_out
