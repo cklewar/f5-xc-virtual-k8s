@@ -15,13 +15,13 @@ This repository consists of Terraform templates to bring up a F5XC Virtual Kuber
 
 ````hcl
 module "vk8s" {
-  source         = "./modules/f5xc/v8ks"
-  f5xc_tenant    = var.f5xc_tenant
-  f5xc_api_url   = var.f5xc_api_url
-  f5xc_api_token = var.f5xc_api_token
-  f5xc_namespace = var.f5xc_virtual_k8s_namespace
-  f5xc_vk8s_name = format("%s-vk8s-%s", var.project_prefix, var.project_suffix)
-  providers      = {
+  source                    = "./modules/f5xc/v8ks"
+  f5xc_tenant               = var.f5xc_tenant
+  f5xc_api_url              = var.f5xc_api_url
+  f5xc_api_token            = var.f5xc_api_token
+  f5xc_vk8s_name            = format("%s-vk8s-%s", var.project_prefix, var.project_suffix)
+  f5xc_vsite_refs_namespace = var.f5xc_namespace
+  providers                 = {
     volterra = volterra.default
   }
 }
