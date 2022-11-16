@@ -7,7 +7,7 @@ variable "project_prefix" {
 variable "project_suffix" {
   type        = string
   description = "prefix string put at the end of string"
-  default     = "02"
+  default     = "01"
 }
 
 variable "f5xc_api_p12_file" {
@@ -176,13 +176,13 @@ resource "local_file" "workload_reference" {
   filename = format("%s/%s", var.f5xc_vk8s_workload_file_path, var.f5xc_vk8s_workload_filename)
 }
 
-resource "local_file" "kubeconfigreference" {
+resource "local_file" "kubeconfig_reference" {
   content  = base64decode(module.credential_reference.api_credential["data"])
   filename = format("%s/%s", local.f5xc_vk8s_kubeconfig_file_path, var.f5xc_vk8s_kubeconfig_filename)
 }
 
 resource "null_resource" "apply_credentials" {
-  depends_on = [module.vk8s_reference, local_file.kubeconfigreference]
+  depends_on = [module.vk8s_reference, local_file.kubeconfig_reference]
   triggers   = {
     kubectl_secret_name                   = var.kubectl_secret_name
     kubectl_secret_registry_type          = var.kubectl_secret_registry_type
@@ -202,27 +202,6 @@ resource "null_resource" "apply_credentials" {
     }
   }
 }
-
-/*resource "null_resource" "apply_workload" {
-  depends_on = [null_resource.apply_credentials, local_file.kubeconfig, local_file.template]
-  triggers   = {
-    manifest_sha1 = sha1(local.template_content)
-  }
-  provisioner "local-exec" {
-    command     = format("kubectl apply -f _output/demo.yml --namespace=%s", var.f5xc_namespace)
-    environment = {
-      KUBECONFIG = format("%s/_output/ves-ns-01-vk8s.yaml", path.root)
-    }
-  }
-  provisioner "local-exec" {
-    when        = destroy
-    command     = "kubectl delete -f _output/demo.yml --ignore-not-found=true"
-    environment = {
-      KUBECONFIG = format("%s/_output/ves-ns-01-vk8s.yaml", path.root)
-    }
-    on_failure = continue
-  }
-}*/
 
 output "kube_config_reference" {
   value     = module.credential_reference.api_credential["data"]
