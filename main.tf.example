@@ -144,7 +144,7 @@ module "vk8s_inline" {
 }
 
 output "kube_config_inline" {
-  value     = module.vk8s_inline.vk8s["kube_config"]
+  value     = module.vk8s_inline.vk8s["k8s_conf"]
   sensitive = true
 }
 
@@ -172,13 +172,15 @@ module "credential_reference" {
 }
 
 resource "local_file" "workload_reference" {
-  content  = local.workload_content
-  filename = format("%s/%s", var.f5xc_vk8s_workload_file_path, var.f5xc_vk8s_workload_filename)
+  depends_on = [module.vk8s_reference.vk8s]
+  content    = local.workload_content
+  filename   = format("%s/%s", var.f5xc_vk8s_workload_file_path, var.f5xc_vk8s_workload_filename)
 }
 
 resource "local_file" "kubeconfig_reference" {
-  content  = module.credential_reference.api_credential["data"]
-  filename = format("%s/%s", local.f5xc_vk8s_kubeconfig_file_path, var.f5xc_vk8s_kubeconfig_filename)
+  depends_on = [module.credential_reference]
+  content    = module.credential_reference.api_credential["k8s_conf"]
+  filename   = format("%s/%s", local.f5xc_vk8s_kubeconfig_file_path, var.f5xc_vk8s_kubeconfig_filename)
 }
 
 resource "null_resource" "apply_credentials" {
@@ -192,20 +194,21 @@ resource "null_resource" "apply_credentials" {
     kubectl_secret_registry_username_type = var.kubectl_secret_registry_username_type
     kubectl_secret_registry_password      = var.kubectl_secret_registry_password
     kubectl_secret_registry_password_type = var.kubectl_secret_registry_password_type
-    kubectl_secret_registry_email         = var.kubectl_secret_registry_email#
+    kubectl_secret_registry_email         = var.kubectl_secret_registry_email
     kubectl_secret_registry_email_type    = var.kubectl_secret_registry_email_type
   }
   provisioner "local-exec" {
     command     = "kubectl create secret ${self.triggers.kubectl_secret_registry_type} ${self.triggers.kubectl_secret_name} ${self.triggers.kubectl_secret_registry_server_type}=${self.triggers.kubectl_secret_registry_server_name} ${self.triggers.kubectl_secret_registry_password_type}=${self.triggers.kubectl_secret_registry_password} ${self.triggers.kubectl_secret_registry_username_type}=${self.triggers.kubectl_secret_registry_username} ${self.triggers.kubectl_secret_registry_email_type}=${self.triggers.kubectl_secret_registry_email} --namespace=shared"
     environment = {
       KUBECONFIG = format("%s/%s", local.f5xc_vk8s_kubeconfig_file_path, var.f5xc_vk8s_kubeconfig_filename)
+
     }
   }
 }
 
 output "kube_config_reference" {
-  value     = module.credential_reference.api_credential["data"]
-  sensitive = true
+  value     = module.credential_reference.api_credential["k8s_conf"]
+  sensitive = false
 }
 
 output "workload_config_reference" {
