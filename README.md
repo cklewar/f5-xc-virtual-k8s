@@ -66,7 +66,7 @@ module "vk8s_inline" {
 }
 
 output "kube_config_inline" {
-  value     = module.vk8s_inline.vk8s["kube_config"]
+  value     = module.vk8s_inline.vk8s["k8s_conf"]
   sensitive = true
 }
 ````
