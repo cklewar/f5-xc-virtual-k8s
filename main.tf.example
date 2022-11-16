@@ -208,7 +208,7 @@ resource "null_resource" "apply_credentials" {
 
 output "kube_config_reference" {
   value     = module.credential_reference.api_credential["k8s_conf"]
-  sensitive = false
+  sensitive = true
 }
 
 output "workload_config_reference" {
