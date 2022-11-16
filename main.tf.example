@@ -31,6 +31,11 @@ variable "f5xc_namespace" {
   default = "system"
 }
 
+variable "f5xc_vsite_refs_namespace" {
+  type    = string
+  default = "system"
+}
+
 variable "f5xc_virtual_k8s_namespace" {
   type    = string
   default = "shared"
@@ -123,41 +128,61 @@ provider "volterra" {
   alias        = "default"
 }
 
-module "vk8s" {
+module "vk8s_inline" {
   source                    = "./modules/f5xc/v8ks"
   f5xc_tenant               = var.f5xc_tenant
   f5xc_api_url              = var.f5xc_api_url
   f5xc_api_token            = var.f5xc_api_token
-  f5xc_vk8s_name            = format("%s-vk8s-%s", var.project_prefix, var.project_suffix)
-  f5xc_vsite_refs_namespace = var.f5xc_namespace
+  f5xc_vk8s_name            = format("%s-vk8s-inline-%s", var.project_prefix, var.project_suffix)
+  f5xc_vsite_refs_namespace = var.f5xc_vsite_refs_namespace
+  f5xc_create_k8s_creds     = true
+  f5xc_namespace            = var.f5xc_namespace
+  f5xc_k8s_credentials_name = format("%s-vk8s-inline-creds-%s", var.project_prefix, var.project_suffix)
   providers                 = {
     volterra = volterra.default
   }
 }
 
-module "credential" {
+output "kube_config_inline" {
+  value     = module.vk8s_inline.vk8s["kube_config"]
+  sensitive = true
+}
+
+module "vk8s_reference" {
+  source                    = "./modules/f5xc/v8ks"
+  f5xc_tenant               = var.f5xc_tenant
+  f5xc_api_url              = var.f5xc_api_url
+  f5xc_api_token            = var.f5xc_api_token
+  f5xc_vk8s_name            = format("%s-vk8s-reference-%s", var.project_prefix, var.project_suffix)
+  f5xc_vsite_refs_namespace = var.f5xc_vsite_refs_namespace
+  providers                 = {
+    volterra = volterra.default
+  }
+}
+
+module "credential_reference" {
   source                    = "./modules/f5xc/api-credential"
   f5xc_tenant               = var.f5xc_tenant
   f5xc_api_url              = var.f5xc_api_url
   f5xc_api_token            = var.f5xc_api_token
   f5xc_namespace            = var.f5xc_namespace
-  f5xc_virtual_k8s_name     = module.vk8s.vk8s["name"]
+  f5xc_virtual_k8s_name     = module.vk8s_reference.vk8s["name"]
   f5xc_api_credential_type  = "KUBE_CONFIG"
   f5xc_api_credentials_name = format("%s-vk8s-credential-%s", var.project_prefix, var.project_suffix)
 }
 
-resource "local_file" "workload" {
+resource "local_file" "workload_reference" {
   content  = local.workload_content
   filename = format("%s/%s", var.f5xc_vk8s_workload_file_path, var.f5xc_vk8s_workload_filename)
 }
 
-resource "local_file" "kubeconfig" {
-  content  = base64decode(module.credential.api_credential["data"])
+resource "local_file" "kubeconfigreference" {
+  content  = base64decode(module.credential_reference.api_credential["data"])
   filename = format("%s/%s", local.f5xc_vk8s_kubeconfig_file_path, var.f5xc_vk8s_kubeconfig_filename)
 }
 
 resource "null_resource" "apply_credentials" {
-  depends_on = [module.vk8s, local_file.kubeconfig]
+  depends_on = [module.vk8s_reference, local_file.kubeconfigreference]
   triggers   = {
     kubectl_secret_name                   = var.kubectl_secret_name
     kubectl_secret_registry_type          = var.kubectl_secret_registry_type
@@ -178,12 +203,32 @@ resource "null_resource" "apply_credentials" {
   }
 }
 
-output "kube_config" {
-  value     = base64decode(module.credential.api_credential["data"])
+/*resource "null_resource" "apply_workload" {
+  depends_on = [null_resource.apply_credentials, local_file.kubeconfig, local_file.template]
+  triggers   = {
+    manifest_sha1 = sha1(local.template_content)
+  }
+  provisioner "local-exec" {
+    command     = format("kubectl apply -f _output/demo.yml --namespace=%s", var.f5xc_namespace)
+    environment = {
+      KUBECONFIG = format("%s/_output/ves-ns-01-vk8s.yaml", path.root)
+    }
+  }
+  provisioner "local-exec" {
+    when        = destroy
+    command     = "kubectl delete -f _output/demo.yml --ignore-not-found=true"
+    environment = {
+      KUBECONFIG = format("%s/_output/ves-ns-01-vk8s.yaml", path.root)
+    }
+    on_failure = continue
+  }
+}*/
+
+output "kube_config_reference" {
+  value     = module.credential_reference.api_credential["data"]
   sensitive = true
 }
 
-output "workload_config" {
+output "workload_config_reference" {
   value = local.workload_content
 }
-
