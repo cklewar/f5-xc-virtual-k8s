@@ -171,13 +171,13 @@ module "credential_reference" {
   f5xc_api_credentials_name = format("%s-vk8s-credential-%s", var.project_prefix, var.project_suffix)
 }
 
-resource "local_file" "kubeconfig_reference" {
-  content  = module.credential_reference.api_credential["data"]
-  filename = format("%s/%s", local.f5xc_vk8s_kubeconfig_file_path, var.f5xc_vk8s_kubeconfig_filename)
+resource "local_file" "workload_reference" {
+  content  = local.workload_content
+  filename = format("%s/%s", var.f5xc_vk8s_workload_file_path, var.f5xc_vk8s_workload_filename)
 }
 
 resource "local_file" "kubeconfig_reference" {
-  content  = base64decode(module.credential_reference.api_credential["data"])
+  content  = module.credential_reference.api_credential["data"]
   filename = format("%s/%s", local.f5xc_vk8s_kubeconfig_file_path, var.f5xc_vk8s_kubeconfig_filename)
 }
 
