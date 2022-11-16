@@ -177,7 +177,7 @@ resource "local_file" "workload_reference" {
 }
 
 resource "local_file" "kubeconfig_reference" {
-  content  = base64decode(module.credential_reference.api_credential["data"])
+  content  = module.credential_reference.api_credential["data"]
   filename = format("%s/%s", local.f5xc_vk8s_kubeconfig_file_path, var.f5xc_vk8s_kubeconfig_filename)
 }
 
