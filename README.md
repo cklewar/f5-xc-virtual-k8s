@@ -19,6 +19,7 @@ module "vk8s" {
   f5xc_tenant               = var.f5xc_tenant
   f5xc_api_url              = var.f5xc_api_url
   f5xc_api_token            = var.f5xc_api_token
+  f5xc_virtual_site_refs    = ["virtual_site_a", "virtual_site_b"]
   f5xc_vk8s_name            = format("%s-vk8s-%s", var.project_prefix, var.project_suffix)
   f5xc_vsite_refs_namespace = var.f5xc_namespace
   providers                 = {
@@ -56,10 +57,11 @@ module "vk8s_inline" {
   f5xc_api_url              = var.f5xc_api_url
   f5xc_api_token            = var.f5xc_api_token
   f5xc_vk8s_name            = format("%s-vk8s-inline-%s", var.project_prefix, var.project_suffix)
-  f5xc_vsite_refs_namespace = var.f5xc_vsite_refs_namespace
-  f5xc_create_k8s_creds     = true
   f5xc_namespace            = var.f5xc_namespace
+  f5xc_create_k8s_creds     = true
+  f5xc_virtual_site_refs    = ["virtual_site_a", "virtual_site_b"]
   f5xc_k8s_credentials_name = format("%s-vk8s-inline-creds-%s", var.project_prefix, var.project_suffix)
+  f5xc_vsite_refs_namespace = var.f5xc_vsite_refs_namespace
   providers                 = {
     volterra = volterra.default
   }
