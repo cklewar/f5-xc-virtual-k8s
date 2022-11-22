@@ -134,7 +134,7 @@ module "vk8s_reference" {
   f5xc_api_url              = var.f5xc_api_url
   f5xc_api_token            = var.f5xc_api_token
   f5xc_vk8s_name            = format("%s-vk8s-reference-%s", var.project_prefix, var.project_suffix)
-  f5xc_virtual_site_refs    = ["virtual_site_a", "virtual_site_b"]
+  f5xc_virtual_site_refs    = ["virtual-site-a", "virtual-site-b"]
   f5xc_vsite_refs_namespace = var.f5xc_vsite_refs_namespace
   providers                 = {
     volterra = volterra.default
