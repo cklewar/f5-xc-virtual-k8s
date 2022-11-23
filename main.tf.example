@@ -218,7 +218,11 @@ output "kube_config_reference" {
   sensitive = false
 }
 
-output "test" {
+output "data" {
+  value = module.credential_reference.api_credential["data"]
+}
+
+output "data1" {
   value = module.credential_reference.api_credential["data"]
 }
 
