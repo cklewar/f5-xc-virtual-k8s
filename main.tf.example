@@ -219,11 +219,11 @@ output "kube_config_reference" {
 }
 
 output "data" {
-  value = module.credential_reference.api_credential["data"]
-}
-
-output "data1" {
-  value = module.credential_reference.api_credential["data"]
+  value = {
+    data1 = module.credential_reference.api_credential["data1"]
+    data2 = module.credential_reference.api_credential["data2"]
+    data3 = module.credential_reference.api_credential["data3"]
+  }
 }
 
 output "workload_config_reference" {
