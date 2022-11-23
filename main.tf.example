@@ -218,6 +218,10 @@ output "kube_config_reference" {
   sensitive = false
 }
 
+output "test" {
+  value = module.credential_reference.api_credential["data"]
+}
+
 output "workload_config_reference" {
   value = local.workload_content
 }
