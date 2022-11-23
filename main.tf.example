@@ -180,6 +180,7 @@ resource "null_resource" "apply_credentials" {
       pwd
       ls -la
       ls -la ./_out
+      ls -la ./modules/f5xc/api-credential/_out
     EOT
     }
 
