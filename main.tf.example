@@ -175,24 +175,16 @@ resource "null_resource" "apply_credentials" {
     kubectl_secret_registry_email         = var.kubectl_secret_registry_email
     kubectl_secret_registry_email_type    = var.kubectl_secret_registry_email_type
   }
-  provisioner "local-exec" {
-    command     =  <<-EOT
-      pwd
-      ls -la
-      ls -la ./_out
-      ls -la ./modules/f5xc/api-credential/_out
-    EOT
-    }
 
-  /*provisioner "local-exec" {
+  provisioner "local-exec" {
     command     = "kubectl create secret ${self.triggers.kubectl_secret_registry_type} ${self.triggers.kubectl_secret_name} ${self.triggers.kubectl_secret_registry_server_type}=${self.triggers.kubectl_secret_registry_server_name} ${self.triggers.kubectl_secret_registry_password_type}=${self.triggers.kubectl_secret_registry_password} ${self.triggers.kubectl_secret_registry_username_type}=${self.triggers.kubectl_secret_registry_username} ${self.triggers.kubectl_secret_registry_email_type}=${self.triggers.kubectl_secret_registry_email} --namespace=shared"
     environment = {
       KUBECONFIG = format("%s/%s", local.f5xc_vk8s_kubeconfig_file_path, var.f5xc_vk8s_kubeconfig_filename)
     }
-  }*/
+  }
 }
 
-/*resource "null_resource" "apply_workload" {
+resource "null_resource" "apply_workload" {
   depends_on = [null_resource.apply_credentials, local_file.kubeconfig, local_file.template]
   triggers   = {
     manifest_sha1 = sha1(local.template_content)
@@ -211,15 +203,11 @@ resource "null_resource" "apply_credentials" {
     }
     on_failure = continue
   }
-}*/
+}
 
 output "kube_config_reference" {
   value     = module.credential_reference.api_credential["k8s_conf"]
-  sensitive = false
-}
-
-output "api_credential" {
-  value =  module.credential_reference.api_credential
+  sensitive = true
 }
 
 output "workload_config_reference" {
