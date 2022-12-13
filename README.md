@@ -19,6 +19,7 @@ module "vk8s" {
   f5xc_tenant               = var.f5xc_tenant
   f5xc_api_url              = var.f5xc_api_url
   f5xc_api_token            = var.f5xc_api_token
+  f5xc_virtual_site_refs    = ["virtual_site_a", "virtual_site_b"]
   f5xc_vk8s_name            = format("%s-vk8s-%s", var.project_prefix, var.project_suffix)
   f5xc_vsite_refs_namespace = var.f5xc_namespace
   providers                 = {
@@ -50,35 +51,24 @@ output "workload_config" {
 ## vk8s create kubeconf inline module usage example 
 
 ````hcl
-module "vk8s" {
+module "vk8s_inline" {
   source                    = "./modules/f5xc/v8ks"
   f5xc_tenant               = var.f5xc_tenant
   f5xc_api_url              = var.f5xc_api_url
   f5xc_api_token            = var.f5xc_api_token
-  f5xc_vk8s_name            = format("%s-vk8s-%s", var.project_prefix, var.project_suffix)
-  f5xc_vsite_refs_namespace = var.f5xc_namespace
+  f5xc_vk8s_name            = format("%s-vk8s-inline-%s", var.project_prefix, var.project_suffix)
+  f5xc_namespace            = var.f5xc_namespace
+  f5xc_create_k8s_creds     = true
+  f5xc_virtual_site_refs    = ["virtual_site_a", "virtual_site_b"]
+  f5xc_k8s_credentials_name = format("%s-vk8s-inline-creds-%s", var.project_prefix, var.project_suffix)
+  f5xc_vsite_refs_namespace = var.f5xc_vsite_refs_namespace
   providers                 = {
     volterra = volterra.default
   }
 }
 
-module "credential" {
-  source                    = "./modules/f5xc/api-credential"
-  f5xc_tenant               = var.f5xc_tenant
-  f5xc_api_url              = var.f5xc_api_url
-  f5xc_api_token            = var.f5xc_api_token
-  f5xc_namespace            = var.f5xc_namespace
-  f5xc_virtual_k8s_name     = module.vk8s.vk8s["name"]
-  f5xc_api_credential_type  = "KUBE_CONFIG"
-  f5xc_api_credentials_name = format("%s-vk8s-credential-%s", var.project_prefix, var.project_suffix)
-}
-
-output "kube_config" {
-  value     = module.credential.api_credential["data"]
+output "kube_config_inline" {
+  value     = module.vk8s_inline.vk8s["k8s_conf"]
   sensitive = true
-}
-
-output "workload_config" {
-  value = local.workload_content
 }
 ````
