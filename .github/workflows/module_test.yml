@@ -172,7 +172,7 @@ jobs:
       uses: actions/upload-artifact@v3
       with:
         name: json_artifact
-        path: ${{ github.workspace }}/modules/f5xc/api-credential/_out/response.json
+        path: ${{ github.workspace }}/modules/f5xc/api-credential/_out/state.json
         retention-days: 1
     - name: Cleanup environment
       id: cleanup_env
