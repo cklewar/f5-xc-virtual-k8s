@@ -1,4 +1,4 @@
-name: F5XC Virtual Kubernetes module
+name: F5XC Virtual k8s module
 on: workflow_dispatch
 jobs:
   f5-xc-vk8s-module-validate:
