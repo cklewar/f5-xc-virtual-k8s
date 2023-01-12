@@ -33,7 +33,7 @@ variable "f5xc_namespace" {
 
 variable "f5xc_vsite_refs_namespace" {
   type    = string
-  default = "default"
+  default = "shared"
 }
 
 variable "f5xc_aws_cred" {
