@@ -161,7 +161,7 @@ resource "local_file" "kubeconfig_reference" {
   filename   = format("%s/%s", local.f5xc_vk8s_kubeconfig_file_path, var.f5xc_vk8s_kubeconfig_filename)
 }
 
-resource "null_resource" "apply_credentials" {
+/*resource "null_resource" "apply_credentials" {
   depends_on = [module.vk8s_reference, local_file.kubeconfig_reference]
   triggers   = {
     kubectl_secret_name                   = var.kubectl_secret_name
@@ -182,9 +182,9 @@ resource "null_resource" "apply_credentials" {
       KUBECONFIG = format("%s/%s", local.f5xc_vk8s_kubeconfig_file_path, var.f5xc_vk8s_kubeconfig_filename)
     }
   }
-}
+}*/
 
-resource "null_resource" "apply_workload" {
+/*resource "null_resource" "apply_workload" {
   depends_on = [null_resource.apply_credentials, local_file.kubeconfig, local_file.template]
   triggers   = {
     manifest_sha1 = sha1(local.template_content)
@@ -203,7 +203,7 @@ resource "null_resource" "apply_workload" {
     }
     on_failure = continue
   }
-}
+}*/
 
 output "kube_config_reference" {
   value     = module.credential_reference.api_credential["k8s_conf"]
