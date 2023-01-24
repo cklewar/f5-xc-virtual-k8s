@@ -230,6 +230,13 @@ resource "null_resource" "apply_credentials" {
   }
 }*/
 
+output "response_api_certificate" {
+  value = {
+    "name" = module.api_credential_api_certificate.api_credential["name"]
+    "type" = module.api_credential_api_certificate.api_credential["type"]
+  }
+}
+
 /*output "kube_config_reference" {
   value     = module.credential_by_reference.api_credential["k8s_conf"]
   sensitive = false
