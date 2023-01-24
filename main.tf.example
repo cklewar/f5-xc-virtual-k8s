@@ -232,8 +232,8 @@ resource "null_resource" "apply_credentials" {
 
 output "response_api_certificate" {
   value = {
-    "name" = module.api_credential_api_certificate.api_credential["name"]
-    "type" = module.api_credential_api_certificate.api_credential["type"]
+    "name" = module.credential_by_reference.api_credential["name"]
+    "type" = module.credential_by_reference.api_credential["type"]
   }
 }
 
