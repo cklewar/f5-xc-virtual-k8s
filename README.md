@@ -22,38 +22,37 @@ module "f5xc_namespace" {
   }
 }
 
-module "vk8s" {
+module "vk8s_reference" {
   source                     = "./modules/f5xc/v8ks"
   f5xc_tenant                = var.f5xc_tenant
   f5xc_api_url               = var.f5xc_api_url
   f5xc_api_token             = var.f5xc_api_token
-  f5xc_virtual_site_refs     = ["virtual_site_a", "virtual_site_b"]
-  f5xc_vk8s_name             = format("%s-vk8s-%s", var.project_prefix, var.project_suffix)
-  f5xc_vsite_refs_namespace  = var.f5xc_namespace
+  f5xc_vk8s_name             = format("%s-vk8s-reference-%s", var.project_prefix, var.project_suffix)
+  f5xc_virtual_site_refs     = ["virtual-site-a", "virtual-site-b"]
+  f5xc_vsite_refs_namespace  = var.f5xc_vsite_refs_namespace
   f5xc_virtual_k8s_namespace = module.f5xc_namespace.namespace["name"]
   providers                  = {
     volterra = volterra.default
   }
 }
 
-module "credential" {
+module "credential_by_reference" {
   source                     = "./modules/f5xc/api-credential"
   f5xc_tenant                = var.f5xc_tenant
   f5xc_api_url               = var.f5xc_api_url
   f5xc_api_token             = var.f5xc_api_token
-  f5xc_namespace             = var.f5xc_namespace
   f5xc_virtual_k8s_name      = module.vk8s_reference.vk8s["name"]
   f5xc_api_credential_type   = "KUBE_CONFIG"
   f5xc_api_credentials_name  = format("%s-vk8s-credential-%s", var.project_prefix, var.project_suffix)
   f5xc_virtual_k8s_namespace = module.f5xc_namespace.namespace["name"]
 }
 
-output "kube_config" {
-  value     = module.credential.api_credential["k8s_conf"]
-  sensitive = true
+output "kube_config_reference" {
+  value     = module.credential_by_reference.api_credential["k8s_conf"]
+  sensitive = false
 }
 
-output "workload_config" {
+output "workload_config_reference" {
   value = local.workload_content
 }
 ````
@@ -69,25 +68,36 @@ module "f5xc_namespace" {
   }
 }
 
+module "f5xc_virtual_site" {
+  source                                = "./modules/f5xc/site/virtual"
+  f5xc_namespace                        = "shared"
+  f5xc_virtual_site_name                = format("%s-regression-%s", var.project_prefix, var.project_suffix)
+  f5xc_virtual_site_type                = "CUSTOMER_EDGE"
+  f5xc_virtual_site_selector_expression = ["site_mesh_group in (regression-sites)"]
+  providers                             = {
+    volterra = volterra.default
+  }
+}
+
 module "vk8s_inline" {
   source                     = "./modules/f5xc/v8ks"
   f5xc_tenant                = var.f5xc_tenant
   f5xc_api_url               = var.f5xc_api_url
   f5xc_api_token             = var.f5xc_api_token
   f5xc_vk8s_name             = format("%s-vk8s-inline-%s", var.project_prefix, var.project_suffix)
-  f5xc_namespace             = var.f5xc_namespace
   f5xc_create_k8s_creds      = true
-  f5xc_virtual_site_refs     = ["virtual_site_a", "virtual_site_b"]
-  f5xc_k8s_credentials_name  = format("%s-vk8s-inline-creds-%s", var.project_prefix, var.project_suffix)
+  f5xc_virtual_k8s_name      = module.vk8s_reference.vk8s["name"]
+  f5xc_virtual_site_refs     = [module.f5xc_virtual_site.virtual-site["name"]]
   f5xc_vsite_refs_namespace  = var.f5xc_vsite_refs_namespace
   f5xc_virtual_k8s_namespace = module.f5xc_namespace.namespace["name"]
+  f5xc_k8s_credentials_name  = format("%s-vk8s-inline-creds-%s", var.project_prefix, var.project_suffix)
   providers                  = {
     volterra = volterra.default
   }
 }
 
 output "kube_config_inline" {
-  value     = module.vk8s_inline.vk8s["k8s_conf"]
+  value = module.vk8s_inline.vk8s["k8s_conf"]
   sensitive = true
 }
 ````
