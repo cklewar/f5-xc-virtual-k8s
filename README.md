@@ -86,7 +86,6 @@ module "vk8s_inline" {
   f5xc_api_token             = var.f5xc_api_token
   f5xc_vk8s_name             = format("%s-vk8s-inline-%s", var.project_prefix, var.project_suffix)
   f5xc_create_k8s_creds      = true
-  f5xc_virtual_k8s_name      = module.vk8s_reference.vk8s["name"]
   f5xc_virtual_site_refs     = [module.f5xc_virtual_site.virtual-site["name"]]
   f5xc_vsite_refs_namespace  = var.f5xc_vsite_refs_namespace
   f5xc_virtual_k8s_namespace = module.f5xc_namespace.namespace["name"]
