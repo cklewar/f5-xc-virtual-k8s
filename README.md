@@ -14,6 +14,14 @@ This repository consists of Terraform templates to bring up a F5XC Virtual Kuber
 ## vk8s create credential by reference module usage example 
 
 ````hcl
+module "f5xc_namespace" {
+  source              = "./modules/f5xc/namespace"
+  f5xc_namespace_name = format("%s-namespace-%s", var.project_prefix, var.project_suffix)
+  providers           = {
+    volterra = volterra.default
+  }
+}
+
 module "vk8s" {
   source                    = "./modules/f5xc/v8ks"
   f5xc_tenant               = var.f5xc_tenant
@@ -28,14 +36,15 @@ module "vk8s" {
 }
 
 module "credential" {
-  source                    = "./modules/f5xc/api-credential"
-  f5xc_tenant               = var.f5xc_tenant
-  f5xc_api_url              = var.f5xc_api_url
-  f5xc_api_token            = var.f5xc_api_token
-  f5xc_namespace            = var.f5xc_namespace
-  f5xc_virtual_k8s_name     = module.vk8s.vk8s["name"]
-  f5xc_api_credential_type  = "KUBE_CONFIG"
-  f5xc_api_credentials_name = format("%s-vk8s-credential-%s", var.project_prefix, var.project_suffix)
+  source                     = "./modules/f5xc/api-credential"
+  f5xc_tenant                = var.f5xc_tenant
+  f5xc_api_url               = var.f5xc_api_url
+  f5xc_api_token             = var.f5xc_api_token
+  f5xc_namespace             = var.f5xc_namespace
+  f5xc_virtual_k8s_name      = module.vk8s_reference.vk8s["name"]
+  f5xc_api_credential_type   = "KUBE_CONFIG"
+  f5xc_api_credentials_name  = format("%s-vk8s-credential-%s", var.project_prefix, var.project_suffix)
+  f5xc_virtual_k8s_namespace = module.f5xc_namespace.namespace["name"]
 }
 
 output "kube_config" {
@@ -51,6 +60,14 @@ output "workload_config" {
 ## vk8s create kubeconf inline module usage example 
 
 ````hcl
+module "f5xc_namespace" {
+  source              = "./modules/f5xc/namespace"
+  f5xc_namespace_name = format("%s-namespace-%s", var.project_prefix, var.project_suffix)
+  providers           = {
+    volterra = volterra.default
+  }
+}
+
 module "vk8s_inline" {
   source                    = "./modules/f5xc/v8ks"
   f5xc_tenant               = var.f5xc_tenant
