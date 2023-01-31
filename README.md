@@ -39,7 +39,7 @@ module "credential" {
 }
 
 output "kube_config" {
-  value     = module.credential.api_credential["data"]
+  value     = module.credential.api_credential["k8s_conf"]
   sensitive = true
 }
 
