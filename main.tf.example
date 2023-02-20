@@ -130,7 +130,7 @@ module "f5xc_namespace" {
 module "f5xc_virtual_site" {
   source                                = "./modules/f5xc/site/virtual"
   f5xc_namespace                        = "shared"
-  f5xc_virtual_site_name                = format("%s-regression-%s", var.project_prefix, var.project_suffix)
+  f5xc_virtual_site_name                = format("%s-regression-vk8s-%s", var.project_prefix, var.project_suffix)
   f5xc_virtual_site_type                = "CUSTOMER_EDGE"
   f5xc_virtual_site_selector_expression = ["site_mesh_group in (regression-sites)"]
   providers                             = {
