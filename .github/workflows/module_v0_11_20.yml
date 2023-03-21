@@ -1,0 +1,259 @@
+name: F5XC Virtual k8s module v0.11.20
+on: workflow_dispatch
+jobs:
+  virtual-k8s-module-validate:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "The job was automatically triggered by a ${{github.event_name}} event."
+      - run: echo "This job is now running on a ${{ runner.os }} server hosted by GitHub."
+      - run: echo "The value of your release is ${{ github.ref }} and your release is ${{ github.release }}."
+      - name: Check out release and submodules
+        uses: actions/checkout@v3
+        with:
+          ref: 
+          fetch-depth: 0
+          submodules: recursive
+      - name: Checkout support repo
+        uses: actions/checkout@v3
+        with:
+          repository: cklewar/f5-xc-test
+          path: f5-xc-cert
+          token:  ${{ secrets.GH_PAT }}
+      - run: echo "The  ${{ github.release }} release has been cloned to the runner."
+      - name: List files in the release
+        run: |
+          ls -la ${{ github.workspace }}
+      - name: List files in the cert release
+        run: |
+          ls -la ${{ github.workspace }}/f5-xc-cert
+      - name: Setup environment
+        id: setup_env
+        run: |
+          cp main.tf.example main.tf
+      - name: Setup Terraform
+        id: setup_tf
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_wrapper: false
+      - name: Terraform fmt
+        id: fmt
+        run: terraform fmt -check
+        continue-on-error: true
+      - name: Terraform Init
+        id: init
+        env:
+          TF_TOKEN_app_terraform_io: ${{ secrets.TF_TOKEN_APP_TERRAFORM_IO }}
+        run: terraform init -upgrade
+      - name: Terraform Validate
+        id: validate
+        run: terraform validate -no-color
+  virtual-k8s-module-plan:
+    runs-on: ubuntu-latest
+    needs: [virtual-k8s-module-validate]
+    steps:
+      - run: echo "The job was automatically triggered by a ${{github.event_name}} event."
+      - run: echo "This job is now running on a ${{ runner.os }} server hosted by GitHub."
+      - run: echo "The value of your release is ${{ github.ref }} and your release is  ${{ github.release }}."
+      - name: Check out release and submodules
+        uses: actions/checkout@v3
+        with:
+          submodules: recursive
+      - name: Checkout support repo
+        uses: actions/checkout@v3
+        with:
+          repository: cklewar/f5-xc-test
+          path: f5-xc-cert
+          token:  ${{ secrets.GH_PAT }}
+      - run: echo "The  ${{ github.release }} release has been cloned to the runner."
+      - name: List files in the release
+        run: |
+          ls -la ${{ github.workspace }}
+      - name: List files in the cert release
+        run: |
+          ls -la ${{ github.workspace }}/f5-xc-cert
+      - name: Setup environment
+        id: setup_env
+        run: |
+           cp main.tf.example main.tf
+      - name: Setup Terraform
+        id: setup_tf
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_wrapper: false
+        continue-on-error: true
+      - name: Terraform Init
+        id: init
+        env:
+          TF_TOKEN_app_terraform_io: ${{ secrets.TF_TOKEN_APP_TERRAFORM_IO }}
+        run:  terraform init -upgrade
+      - name: Terraform Plan
+        id: plan
+        env:
+          GH_PAT: ${{ secrets.GH_PAT }}
+          TF_TOKEN_APP_TERRAFORM_IO: ${{ secrets.TF_TOKEN_APP_TERRAFORM_IO }}
+          VES_P12_PASSWORD: ${{ secrets.VES_P12_PASSWORD }}
+          TF_VAR_f5xc_api_url: ${{ secrets.F5XC_API_URL }}
+          TF_VAR_f5xc_api_p12_file_nfv: ${{ secrets.F5XC_API_P12_FILE_NFV }}
+          TF_VAR_f5xc_api_p12_file: ${{ secrets.F5XC_API_P12_FILE }}
+          TF_VAR_f5xc_tenant: ${{ secrets.F5XC_TENANT }}
+          TF_VAR_f5xc_api_token: ${{ secrets.F5XC_API_TOKEN }}
+          TF_VAR_f5xc_api_credential_password: ${{ secrets.F5XC_API_CREDENTIAL_PASSWORD }}
+          TF_VAR_kubectl_secret_registry_username: ${{ secrets.KUBECTL_SECRET_REGISTRY_USERNAME }}
+          TF_VAR_kubectl_secret_registry_password: ${{ secrets.KUBECTL_SECRET_REGISTRY_PASSWORD }}
+          TF_VAR_kubectl_secret_registry_email: ${{ secrets.KUBECTL_SECRET_REGISTRY_EMAIL }}
+        run: terraform plan -no-color
+        continue-on-error: false
+      - name: Cleanup environment
+        id: cleanup_env
+        run: |
+          rm main.tf
+      - run: echo "This job's status is ${{ job.status }}."
+  virtual-k8s-module-apply:
+    runs-on: ubuntu-latest
+    needs: [virtual-k8s-module-plan]
+    steps:
+      - run: echo "The job was automatically triggered by a ${{github.event_name}} event."
+      - run: echo "This job is now running on a ${{ runner.os }} server hosted by GitHub."
+      - run: echo "The value of your release is ${{ github.ref }} and your release is  ${{ github.release }}."
+      - name: Check out release and submodules
+        uses: actions/checkout@v3
+        with:
+          submodules: recursive
+      - name: Checkout support repo
+        uses: actions/checkout@v3
+        with:
+          repository: cklewar/f5-xc-test
+          path: f5-xc-cert
+          token:  ${{ secrets.GH_PAT }}
+      - run: echo "The  ${{ github.release }} release has been cloned to the runner."
+      - name: List files in the release
+        run: |
+          ls -la ${{ github.workspace }}
+      - name: List files in the cert release
+        run: |
+          ls -la ${{ github.workspace }}/f5-xc-cert
+      - name: Setup environment
+        id: setup_env
+        run: |
+          cp main.tf.example main.tf
+      - name: Setup Terraform
+        id: setup_tf
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_wrapper: false
+        continue-on-error: true
+      - name: Terraform Init
+        id: init
+        env:
+          TF_TOKEN_app_terraform_io: ${{ secrets.TF_TOKEN_APP_TERRAFORM_IO }}
+        run:  terraform init -upgrade
+      - name: Terraform Apply
+        id: apply
+        env:
+          GH_PAT: ${{ secrets.GH_PAT }}
+          TF_TOKEN_APP_TERRAFORM_IO: ${{ secrets.TF_TOKEN_APP_TERRAFORM_IO }}
+          VES_P12_PASSWORD: ${{ secrets.VES_P12_PASSWORD }}
+          TF_VAR_f5xc_api_url: ${{ secrets.F5XC_API_URL }}
+          TF_VAR_f5xc_api_p12_file_nfv: ${{ secrets.F5XC_API_P12_FILE_NFV }}
+          TF_VAR_f5xc_api_p12_file: ${{ secrets.F5XC_API_P12_FILE }}
+          TF_VAR_f5xc_tenant: ${{ secrets.F5XC_TENANT }}
+          TF_VAR_f5xc_api_token: ${{ secrets.F5XC_API_TOKEN }}
+          TF_VAR_f5xc_api_credential_password: ${{ secrets.F5XC_API_CREDENTIAL_PASSWORD }}
+          TF_VAR_kubectl_secret_registry_username: ${{ secrets.KUBECTL_SECRET_REGISTRY_USERNAME }}
+          TF_VAR_kubectl_secret_registry_password: ${{ secrets.KUBECTL_SECRET_REGISTRY_PASSWORD }}
+          TF_VAR_kubectl_secret_registry_email: ${{ secrets.KUBECTL_SECRET_REGISTRY_EMAIL }}
+        run: terraform apply -auto-approve -no-color
+        continue-on-error: false
+      - name: List files in the modules repository
+        id: list_state_file
+        env:
+          TF_TOKEN_app_terraform_io: ${{ secrets.TF_TOKEN_APP_TERRAFORM_IO }}
+        run: |
+          echo "api_credential_name=$(terraform output -json | jq -r '.response_api_certificate.value.name')" >> $GITHUB_ENV
+          ls -la ${{ github.workspace }}/modules/f5xc/api-credential/_out/${{ env.api_credential_name }}
+      - name: Copy JSON state
+        id: copy_state
+        uses: actions/upload-artifact@v3
+        with:
+          name: json_artifact
+          path: ${{ github.workspace }}/modules/f5xc/api-credential/_out/${{ env.api_credential_name }}/state.json
+          retention-days: 1
+      - name: Cleanup environment
+        id: cleanup_env
+        run: |
+          rm main.tf
+      - run: echo "This job's status is ${{ job.status }}."
+  virtual-k8s-module-destroy:
+    runs-on: ubuntu-latest
+    needs: [virtual-k8s-module-apply]
+    steps:
+      - run: echo "The job was automatically triggered by a ${{github.event_name}} event."
+      - run: echo "This job is now running on a ${{ runner.os }} server hosted by GitHub."
+      - run: echo "The value of your release is ${{ github.ref }} and your release is  ${{ github.release }}."
+      - name: Check out release and submodules
+        uses: actions/checkout@v3
+        with:
+          submodules: recursive
+      - name: Checkout support repo
+        uses: actions/checkout@v3
+        with:
+          repository: cklewar/f5-xc-test
+          path: f5-xc-cert
+          token:  ${{ secrets.GH_PAT }}
+      - run: echo "The  ${{ github.release }} release has been cloned to the runner."
+      - name: Setup environment
+        id: setup_env
+        run: |
+          cp main.tf.example main.tf
+      - name: Setup Terraform
+        id: setup_tf
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_wrapper: false
+        continue-on-error: true
+      - name: Terraform Init
+        id: init
+        env:
+          TF_TOKEN_app_terraform_io: ${{ secrets.TF_TOKEN_APP_TERRAFORM_IO }}
+        run: terraform init -upgrade
+      - name: Get API Credential Name
+        id: get_api_credential_name
+        env:
+          TF_TOKEN_app_terraform_io: ${{ secrets.TF_TOKEN_APP_TERRAFORM_IO }}
+        run: |
+          echo "api_credential_name=$(terraform output -json | jq -r '.response_api_certificate.value.name')" >> $GITHUB_ENV
+          ls -la ${{ github.workspace }}/modules/f5xc/api-credential/_out/${{ env.api_credential_name }}
+      - name: Copy JSON state
+        uses: actions/download-artifact@v3
+        with:
+          name: json_artifact
+          path: ${{ github.workspace }}/modules/f5xc/api-credential/_out/${{ env.api_credential_name }}
+      - name: List files in the repository
+        run: |
+          ls -la ${{ github.workspace }}
+          echo ${{ env.api_credential_name }}
+      - name: List files in the cert repository
+        run: |
+          ls -la ${{ github.workspace }}/f5-xc-cert
+      - name: Terraform Destroy
+        id: destroy
+        env:
+          GH_PAT: ${{ secrets.GH_PAT }}
+          TF_TOKEN_APP_TERRAFORM_IO: ${{ secrets.TF_TOKEN_APP_TERRAFORM_IO }}
+          VES_P12_PASSWORD: ${{ secrets.VES_P12_PASSWORD }}
+          TF_VAR_f5xc_api_url: ${{ secrets.F5XC_API_URL }}
+          TF_VAR_f5xc_api_p12_file_nfv: ${{ secrets.F5XC_API_P12_FILE_NFV }}
+          TF_VAR_f5xc_api_p12_file: ${{ secrets.F5XC_API_P12_FILE }}
+          TF_VAR_f5xc_tenant: ${{ secrets.F5XC_TENANT }}
+          TF_VAR_f5xc_api_token: ${{ secrets.F5XC_API_TOKEN }}
+          TF_VAR_f5xc_api_credential_password: ${{ secrets.F5XC_API_CREDENTIAL_PASSWORD }}
+          TF_VAR_kubectl_secret_registry_username: ${{ secrets.KUBECTL_SECRET_REGISTRY_USERNAME }}
+          TF_VAR_kubectl_secret_registry_password: ${{ secrets.KUBECTL_SECRET_REGISTRY_PASSWORD }}
+          TF_VAR_kubectl_secret_registry_email: ${{ secrets.KUBECTL_SECRET_REGISTRY_EMAIL }}
+        run: terraform destroy -auto-approve -no-color
+        continue-on-error: false
+      - name: Cleanup environment
+        id: cleanup_env
+        run: |
+          rm main.tf
+      - run: echo "This job's status is ${{ job.status }}."
