@@ -101,7 +101,7 @@ jobs:
           TF_VAR_kubectl_secret_registry_username: ${{ secrets.KUBECTL_SECRET_REGISTRY_USERNAME }}
           TF_VAR_kubectl_secret_registry_password: ${{ secrets.KUBECTL_SECRET_REGISTRY_PASSWORD }}
           TF_VAR_kubectl_secret_registry_email: ${{ secrets.KUBECTL_SECRET_REGISTRY_EMAIL }}
-        run: terraform plan -no-color
+        run: terraform plan -var='f5xc_api_credential_module_root=${{ github.workspace }}' -no-color
         continue-on-error: false
       - name: Cleanup environment
         id: cleanup_env
