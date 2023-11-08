@@ -168,7 +168,7 @@ module "vk8s_reference" {
   f5xc_api_url               = var.f5xc_api_url
   f5xc_api_token             = var.f5xc_api_token
   f5xc_vk8s_name             = format("%s-vk8s-reference-%s", var.project_prefix, var.project_suffix)
-  f5xc_virtual_site_refs     = module.f5xc_virtual_site.virtual_site["name"] #["virtual-site-a", "virtual-site-b"]
+  f5xc_virtual_site_refs     = [module.f5xc_virtual_site.virtual_site["name"]]
   f5xc_vsite_refs_namespace  = var.f5xc_vsite_refs_namespace
   f5xc_virtual_k8s_namespace = module.f5xc_namespace.namespace["name"]
   providers                  = {
