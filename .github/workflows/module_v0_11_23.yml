@@ -162,7 +162,7 @@ jobs:
           TF_VAR_kubectl_secret_registry_username: ${{ secrets.KUBECTL_SECRET_REGISTRY_USERNAME }}
           TF_VAR_kubectl_secret_registry_password: ${{ secrets.KUBECTL_SECRET_REGISTRY_PASSWORD }}
           TF_VAR_kubectl_secret_registry_email: ${{ secrets.KUBECTL_SECRET_REGISTRY_EMAIL }}
-        run: terraform apply -auto-approve -no-color
+        run: terraform apply -var='f5xc_api_credential_module_root=${{ github.workspace }}' -auto-approve -no-color
         continue-on-error: false
       - name: List files in the modules repository
         id: list_state_file
@@ -252,7 +252,7 @@ jobs:
             TF_VAR_kubectl_secret_registry_username: ${{ secrets.KUBECTL_SECRET_REGISTRY_USERNAME }}
             TF_VAR_kubectl_secret_registry_password: ${{ secrets.KUBECTL_SECRET_REGISTRY_PASSWORD }}
             TF_VAR_kubectl_secret_registry_email: ${{ secrets.KUBECTL_SECRET_REGISTRY_EMAIL }}
-        run: terraform apply -auto-approve -no-color
+        run: terraform apply -var='f5xc_api_credential_module_root=${{ github.workspace }}' -auto-approve -no-color
         continue-on-error: false
       - name: Cleanup environment
         id: cleanup_env
@@ -326,7 +326,7 @@ jobs:
           TF_VAR_kubectl_secret_registry_username: ${{ secrets.KUBECTL_SECRET_REGISTRY_USERNAME }}
           TF_VAR_kubectl_secret_registry_password: ${{ secrets.KUBECTL_SECRET_REGISTRY_PASSWORD }}
           TF_VAR_kubectl_secret_registry_email: ${{ secrets.KUBECTL_SECRET_REGISTRY_EMAIL }}
-        run: terraform destroy -auto-approve -no-color
+        run: terraform destroy -var='f5xc_api_credential_module_root=${{ github.workspace }}' -auto-approve -no-color
         continue-on-error: false
       - name: Cleanup environment
         id: cleanup_env
