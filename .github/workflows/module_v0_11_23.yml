@@ -233,10 +233,11 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: json_artifact
-          path: ${{ github.workspace }}/modules/f5xc/api-credential/_out/${{ env.api_credential_name }}/state.json
+          path: ${{ github.workspace }}/modules/f5xc/api-credential/_out/${{ env.api_credential_name }}
       - name: List files in the repository
         run: |
           ls -la ${{ github.workspace }}
+          ls -la ${{ github.workspace }}/modules/f5xc/api-credential/_out/${{ env.api_credential_name }}
           echo ${{ env.api_credential_name }}
       - name: Terraform Apply
         id: reapply
