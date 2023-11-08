@@ -122,7 +122,7 @@ provider "volterra" {
 module "f5xc_namespace" {
   source                        = "./modules/f5xc/namespace"
   f5xc_namespace_name           = format("%s-namespace-vk8s-%s", var.project_prefix, var.project_suffix)
-  f5xc_namespace_create_timeout = "60s"
+  f5xc_namespace_create_timeout = "120s"
   providers                     = {
     volterra = volterra.default
   }
