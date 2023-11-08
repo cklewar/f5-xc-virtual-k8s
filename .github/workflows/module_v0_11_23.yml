@@ -169,6 +169,7 @@ jobs:
         env:
           TF_TOKEN_app_terraform_io: ${{ secrets.TF_TOKEN_APP_TERRAFORM_IO }}
         run: |
+          terraform output -json | jq -r '.response_api_certificate.value.name'
           echo "api_credential_name=$(terraform output -json | jq -r '.response_api_certificate.value.name')" >> $GITHUB_ENV
           ls -la ${{ github.workspace }}/modules/f5xc/api-credential/_out/${{ env.api_credential_name }}
       - name: Copy JSON state
