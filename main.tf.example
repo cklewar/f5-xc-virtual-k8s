@@ -128,7 +128,6 @@ module "f5xc_namespace" {
   }
 }
 
-
 module "f5xc_virtual_site" {
   source                                = "./modules/f5xc/site/virtual"
   f5xc_namespace                        = "shared"
