@@ -23,7 +23,7 @@ variable "f5xc_api_token" {
 }
 
 variable "f5xc_tenant" {
-  type    = string
+  type = string
 }
 
 variable "f5xc_namespace" {
@@ -116,12 +116,13 @@ provider "volterra" {
   api_p12_file = var.f5xc_api_p12_file
   url          = var.f5xc_api_url
   alias        = "default"
+  timeout      = "30s"
 }
 
 module "f5xc_namespace" {
   source                        = "./modules/f5xc/namespace"
   f5xc_namespace_name           = format("%s-namespace-vk8s-%s", var.project_prefix, var.project_suffix)
-  f5xc_namespace_create_timeout = "40s"
+  f5xc_namespace_create_timeout = "60s"
   providers                     = {
     volterra = volterra.default
   }
