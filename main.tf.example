@@ -178,6 +178,7 @@ module "vk8s_reference" {
 }
 
 module "credential_by_reference" {
+  depends_on                 = [module.vk8s_reference]
   source                     = "./modules/f5xc/api-credential"
   f5xc_tenant                = var.f5xc_tenant
   f5xc_api_url               = var.f5xc_api_url
