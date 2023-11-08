@@ -174,6 +174,9 @@ jobs:
       - name: Copy JSON state
         id: copy_state
         uses: actions/upload-artifact@v3
+        run: |
+          echo "api_credential_name=$(terraform output -json | jq -r '.response_api_certificate.value.name')" >> $GITHUB_ENV
+          ls -la ${{ github.workspace }}/modules/f5xc/api-credential/_out/${{ env.api_credential_name }}
         with:
           name: json_artifact
           path: ${{ github.workspace }}/modules/f5xc/api-credential/_out/${{ env.api_credential_name }}/state.json
