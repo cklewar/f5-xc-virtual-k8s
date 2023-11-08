@@ -308,6 +308,7 @@ jobs:
       - name: List files in the repository
         run: |
           ls -la ${{ github.workspace }}
+          ls -la ${{ github.workspace }}/modules/f5xc/api-credential/_out/${{ env.api_credential_name }}
           echo ${{ env.api_credential_name }}
       - name: List files in the cert repository
         run: |
