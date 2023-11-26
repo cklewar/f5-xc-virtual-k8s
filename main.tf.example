@@ -23,7 +23,7 @@ variable "f5xc_api_token" {
 }
 
 variable "f5xc_tenant" {
-  type    = string
+  type = string
 }
 
 variable "f5xc_namespace" {
@@ -104,6 +104,10 @@ variable "kubectl_secret_registry_server_name" {
   default = "docker.io"
 }
 
+variable "f5xc_api_credential_module_root" {
+  type = string
+}
+
 locals {
   f5xc_vk8s_template_file_path   = format("%s/%s", path.module, "templates")
   f5xc_vk8s_kubeconfig_file_path = format("%s/%s", path.module, "_out")
@@ -116,6 +120,7 @@ provider "volterra" {
   api_p12_file = var.f5xc_api_p12_file
   url          = var.f5xc_api_url
   alias        = "default"
+  timeout      = "30s"
 }
 
 module "f5xc_namespace" {
@@ -127,7 +132,6 @@ module "f5xc_namespace" {
   }
 }
 
-/*
 module "f5xc_virtual_site" {
   source                                = "./modules/f5xc/site/virtual"
   f5xc_namespace                        = "shared"
@@ -139,7 +143,7 @@ module "f5xc_virtual_site" {
   }
 }
 
-module "vk8s_inline" {
+/*module "vk8s_inline" {
   source                     = "./modules/f5xc/v8ks"
   f5xc_tenant                = var.f5xc_tenant
   f5xc_api_url               = var.f5xc_api_url
@@ -163,28 +167,30 @@ output "kube_config_inline" {
 */
 
 module "vk8s_reference" {
-  source                     = "./modules/f5xc/v8ks"
-  f5xc_tenant                = var.f5xc_tenant
-  f5xc_api_url               = var.f5xc_api_url
-  f5xc_api_token             = var.f5xc_api_token
-  f5xc_vk8s_name             = format("%s-vk8s-reference-%s", var.project_prefix, var.project_suffix)
-  f5xc_virtual_site_refs     = ["virtual-site-a", "virtual-site-b"]
-  f5xc_vsite_refs_namespace  = var.f5xc_vsite_refs_namespace
-  f5xc_virtual_k8s_namespace = module.f5xc_namespace.namespace["name"]
-  providers                  = {
+  source                          = "./modules/f5xc/v8ks"
+  f5xc_tenant                     = var.f5xc_tenant
+  f5xc_api_url                    = var.f5xc_api_url
+  f5xc_api_token                  = var.f5xc_api_token
+  f5xc_vk8s_name                  = format("%s-vk8s-reference-%s", var.project_prefix, var.project_suffix)
+  f5xc_virtual_site_refs          = [module.f5xc_virtual_site.virtual_site["name"]]
+  f5xc_vsite_refs_namespace       = var.f5xc_vsite_refs_namespace
+  f5xc_virtual_k8s_namespace      = module.f5xc_namespace.namespace["name"]
+  providers                       = {
     volterra = volterra.default
   }
 }
 
 module "credential_by_reference" {
-  source                     = "./modules/f5xc/api-credential"
-  f5xc_tenant                = var.f5xc_tenant
-  f5xc_api_url               = var.f5xc_api_url
-  f5xc_api_token             = var.f5xc_api_token
-  f5xc_virtual_k8s_name      = module.vk8s_reference.vk8s["name"]
-  f5xc_api_credential_type   = "KUBE_CONFIG"
-  f5xc_api_credentials_name  = format("%s-vk8s-credential-%s", var.project_prefix, var.project_suffix)
-  f5xc_virtual_k8s_namespace = module.f5xc_namespace.namespace["name"]
+  depends_on                      = [module.vk8s_reference]
+  source                          = "./modules/f5xc/api-credential"
+  f5xc_tenant                     = var.f5xc_tenant
+  f5xc_api_url                    = var.f5xc_api_url
+  f5xc_api_token                  = var.f5xc_api_token
+  f5xc_virtual_k8s_name           = module.vk8s_reference.vk8s["name"]
+  f5xc_api_credential_type        = "KUBE_CONFIG"
+  f5xc_api_credentials_name       = format("%s-vk8s-credential-%s", var.project_prefix, var.project_suffix)
+  f5xc_virtual_k8s_namespace      = module.f5xc_namespace.namespace["name"]
+  f5xc_api_credential_module_root = var.f5xc_api_credential_module_root
 }
 
 /*resource "local_file" "workload_reference" {
